@@ -62,7 +62,7 @@ resource "aws_eip" "nat" {
 resource "aws_nat_gateway" "this" {
   count         = var.enable_nat ? 1 : 0
   subnet_id     = aws_subnet.public[0].id
-  allocation_id = var.enable_nat ? aws_eip.nat[0].id : null
+  allocation_id = var.enable_nat ? aws_eip.nat[0].id : null 
 
   tags = merge({
     Name        = "${var.client_name}-${var.environment}-nat-gateway"

@@ -14,7 +14,7 @@ provider "aws" {
 
 # VPC Module - with free-tier settings
 module "vpc" {
-  source = "./vpc"
+  source = "./modules/vpc"
 
   client_name         = var.client_name
   environment         = var.environment
@@ -29,7 +29,7 @@ module "vpc" {
 
 # EC2 Module (Bastion) - for secure access to private resources
 module "ec2_bastion" {
-  source = "./ec2"
+  source = "./modules/ec2"
 
   subnet_id              = module.vpc.public_subnet_ids[0]
   security_group_id      = module.vpc.bastion_security_group_id
@@ -45,7 +45,7 @@ module "ec2_bastion" {
 # Optional: Application EC2 in private subnet (no public IP)
 module "ec2_app" {
   count  = var.deploy_app_instance ? 1 : 0
-  source = "./ec2"
+  source = "./modules/ec2"
 
   subnet_id              = module.vpc.private_subnet_ids[0]
   security_group_id      = module.vpc.app_security_group_id
@@ -57,3 +57,15 @@ module "ec2_app" {
   vpc_id                 = module.vpc.vpc_id
   tags                   = var.common_tags
 }
+
+# RDS Cloud Backup Instance
+module "rds" {
+  source = "./modules/rds"
+
+  db_subnet_group_name   = module.vpc.db_subnet_group
+  vpc_security_group_ids = [module.vpc.rds_security_group_id]
+  kms_key_id             = aws_kms_key.hospital_kms.arn
+  password               = var.db_password
+  tags                   = var.common_tags
+}
+

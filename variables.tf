@@ -90,3 +90,11 @@ variable "common_tags" {
     Project   = "Database-RDS"
   }
 }
+
+variable "db_password" {
+  type        = string
+  description = "Password for the RDS cloud database"
+  sensitive   = true
+  default     = "CloudSecurePasswordBackup123!" # In production, set this via secrets/env
+}
+
